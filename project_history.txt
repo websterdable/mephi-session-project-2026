@@ -49,12 +49,11 @@
    49  chmod u-s /usr/sbin/tcpdump
    50  setcap cap_net_raw,cap_net_admin+ep /usr/sbin/tcpdump
    51  getcap /usr/sbin/tcpdump
-   52  echo "root" > /etc/ssh/denied_users
-   53  echo "auth required pam_listfile.so onerr=fail item=user sense=deny file=/etc/ssh/denied_users" >> /etc?pam.d/login
-   54  echo "auth required pam_listfile.so onerr=fail item=user sense=deny file=/etc/ssh/denied_users" >> /etc/pam.d/sshd
-   55  echo "auth required pam_listfile.so onerr=fail item=user sense=deny file=/etc/ssh/denied_users" >> /etc/pam.d/login
-   56  su - mephi-admin
-   57  curl http://192.168.1.100
-   58  curl -s http://192.168.1.100 > /tmp/curl_output.txt
-   59  cd /root
-   60  history > project_history.txt
+   52  echo "root" > /etc/security/denied_users
+   53  echo "auth required pam_listfile.so onerr=fail item=user sense=deny file=/etc/security/denied_users" >> /etc/pam.d/sshd
+   54  echo "auth required pam_listfile.so onerr=fail item=user sense=deny file=/etc/security/denied_users" >> /etc/pam.d/login
+   55  su - mephi-admin
+   56  curl http://192.168.1.100
+   57  curl -s http://192.168.1.100 > /tmp/curl_output.txt
+   58  cd /root
+   59  history > project_history.txt
