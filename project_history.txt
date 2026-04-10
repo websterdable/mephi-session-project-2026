@@ -1,0 +1,60 @@
+    1  hostnamectl
+    2  ip a
+    3  nmcli connection show
+    4  su -
+    5  dnf install -y kernel-devel gcc make perl
+    6  mount /dev/cdrom /mnt
+    7  cd /mnt
+    8  ./VBoxLinuxAdditions.run
+    9  reboot
+   10  hostnamectl
+   11  dnf install -y nginx tcpdump libcap-ng-utils
+   12  nmcli connection show
+   13  nmcli connection modify enp0s3 ipv4.addresses 192.168.1.100/24
+   14  nmcli connection modify enp0s3 ipv4.gateway 192.168.1.1
+   15  nmcli connection modify enp0s3 ipv4.dns "8.8.8.8"
+   16  nmcli connection modify enp0s3 ipv4.method manual
+   17  nmcli connection down enp0s3
+   18  nmcli connection up enp0s3
+   19  ip a | grep 192.168.1.100
+   20  ping -c 4 8.8.8.8
+   21  ping -c 4 192.168.1.1
+   22  ping -c 4 8.8.8.8 > /tmp/network_check.txt
+   23  ping -c 4 192.168.1.1 >> /tmp/network_check.txt
+   24  cd /tmp
+   25  dnf download tcpdump
+   26  rpm -ivh --nodeps tcpdump-*.rpm
+   27  shutdown now
+   28  lsblk
+   29  fdisk /dev/sdb
+   30  mkfs.ext4 -L MEPHI_DATA /dev/sdb1
+   31  mkdir -p /data/mephi-web
+   32  echo 'LABEL=MEPHI_DATA /data/mephi-web ext4 defaults 0 0' >> /etc/fstab
+   33  mount -a
+   34  systemctl daemon-reload
+   35  mount -a
+   36  df -h /data/mephi-web
+   37  systemctl enable --now nginx
+   38  systemctl status nginx
+   39  journalctl -u nginx --since "5 minutes ago" > /tmp/nginx_recent_logs.txt
+   40  useradd mephi-admin
+   41  echo 'mephi-admin:P@ssw0rd2026' | chpasswd
+   42  groupadd mephi-devs
+   43  usermod -aG mephi-devs mephi-admin
+   44  chown mephi-admin:mephi-devs /data/mephi-web
+   45  chmod 2775 /data/mephi-web
+   46  setenforce 1
+   47  semanage fcontext -a -t httpd_sys_content_t "/data/mephi-web(/.*)?"
+   48  restorecon -Rv /data/mephi-web
+   49  chmod u-s /usr/sbin/tcpdump
+   50  setcap cap_net_raw,cap_net_admin+ep /usr/sbin/tcpdump
+   51  getcap /usr/sbin/tcpdump
+   52  echo "root" > /etc/ssh/denied_users
+   53  echo "auth required pam_listfile.so onerr=fail item=user sense=deny file=/etc/ssh/denied_users" >> /etc?pam.d/login
+   54  echo "auth required pam_listfile.so onerr=fail item=user sense=deny file=/etc/ssh/denied_users" >> /etc/pam.d/sshd
+   55  echo "auth required pam_listfile.so onerr=fail item=user sense=deny file=/etc/ssh/denied_users" >> /etc/pam.d/login
+   56  su - mephi-admin
+   57  curl http://192.168.1.100
+   58  curl -s http://192.168.1.100 > /tmp/curl_output.txt
+   59  cd /root
+   60  history > project_history.txt
